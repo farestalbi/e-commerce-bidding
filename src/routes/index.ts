@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth';
 import productRoutes from './products';
 import bidRoutes from './bids';
+import notificationRoutes from './notifications';
 
 const router = Router();
 
@@ -13,6 +14,9 @@ router.use('/products', productRoutes);
 
 // Bid routes
 router.use('/bids', bidRoutes);
+
+// Notification routes
+router.use('/notifications', notificationRoutes);
 
 // Future route modules will be added here
 // router.use('/users', userRoutes);

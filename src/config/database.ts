@@ -21,7 +21,7 @@ export const AppDataSource = new DataSource({
   password: dbPassword,
   database: dbName,
   synchronize: environment === 'development',
-  logging: environment === 'development',
+  logging: false, // Disable SQL query logging
   entities: [User, Product, Bid, Order, OrderItem],
   migrations: [],
   subscribers: [],

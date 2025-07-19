@@ -9,6 +9,7 @@ import {
   NotFoundError,
   ForbiddenError,
 } from "../utils/ApiError";
+import { NotificationService } from "../services/notificationService";
 
 // Place a bid on an auction product
 export const placeBid = asyncHandler(async (req: Request, res: Response) => {
@@ -74,8 +75,28 @@ export const placeBid = asyncHandler(async (req: Request, res: Response) => {
     currentHighestBid: amount,
   });
 
-  // TODO: Send notification to previous highest bidder (if different user)
-  // TODO: Send notification to product owner
+  // Send notification to previous highest bidder (if different user)
+  if (currentHighestBid > product.startingPrice) {
+    // Find the previous highest bidder
+    const previousHighestBid = await bidRepository.findOne({
+      where: {
+        productId: productId,
+        amount: currentHighestBid,
+      },
+      relations: ["user"],
+      order: { createdAt: "DESC" },
+    });
+
+    if (previousHighestBid && previousHighestBid.userId !== userId) {
+      // Send outbid notification to the previous highest bidder
+      await NotificationService.sendOutbidNotification(
+        previousHighestBid.userId,
+        product.name,
+        amount,
+        productId
+      );
+    }
+  }
 
   res.status(201).json({
     success: true,
