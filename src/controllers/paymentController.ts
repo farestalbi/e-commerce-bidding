@@ -64,7 +64,6 @@ async function sendPaymentStatusNotification(
   newStatus: string
 ): Promise<void> {
   try {
-    // Import NotificationService here to avoid circular dependencies
     const { NotificationService } = await import(
       "../services/notificationService"
     );
@@ -106,7 +105,6 @@ async function sendPaymentStatusNotification(
     );
   } catch (error) {
     console.error("Failed to send payment status notification:", error);
-    // Don't throw - notification failure shouldn't break the webhook
   }
 }
 

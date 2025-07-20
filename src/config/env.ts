@@ -29,12 +29,12 @@ export const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
 export const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 export const apiUrl = process.env.API_URL || "http://localhost:3000";
 
-// Firebase Configuration (for later use)
+// Firebase Configuration
 export const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
 export const firebasePrivateKey = process.env.FIREBASE_PRIVATE_KEY;
 export const firebaseClientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
-// MyFatoorah Configuration (for later use)
+// MyFatoorah Configuration
 export const myFatoorahApiKey = process.env.MYFATOORAH_API_KEY;
 export const myFatoorahBaseUrl = process.env.MYFATOORAH_BASE_URL || "https://api.myfatoorah.com";
 
