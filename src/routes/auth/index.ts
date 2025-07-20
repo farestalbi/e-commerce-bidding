@@ -5,11 +5,17 @@ import {
   googleAuthCallback,
   login,
   register,
-  updateProfile,
+  addFcmToken,
+  removeFcmToken,
 } from "../../controllers/authController";
 import { authenticateToken } from "../../middleware/authentication";
-import { validate } from "../../middleware/validation";
-import { loginSchema, registerSchema, updateProfileSchema } from "./authSchema";
+import { validate, ValidationSource } from "../../middleware/validation";
+import {
+  addFcmTokenSchema,
+  loginSchema,
+  registerSchema,
+  removeFcmTokenSchema,
+} from "./authSchema";
 
 const router = Router();
 
@@ -23,11 +29,19 @@ router.get("/google/callback", googleAuthCallback);
 
 // Protected routes
 router.get("/profile", authenticateToken, getProfile);
-router.put(
-  "/profile",
+
+// FCM Token management routes
+router.post(
+  "/fcm-token",
   authenticateToken,
-  validate(updateProfileSchema),
-  updateProfile
+  validate(addFcmTokenSchema, ValidationSource.BODY),
+  addFcmToken
+);
+router.delete(
+  "/fcm-token",
+  authenticateToken,
+  validate(removeFcmTokenSchema, ValidationSource.BODY),
+  removeFcmToken
 );
 
 export default router;

@@ -1,16 +1,17 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import passport from 'passport';
-import { User } from '../entities/User';
-import { asyncHandler } from '../utils/asyncHandler';
-import { jwtSecret, frontendUrl } from '../config/env';
-import { 
-  BadRequestError, 
-  AuthFailureError, 
-  NotFoundError 
-} from '../utils/ApiError';
-import { AppDataSource } from '../config/database';
+import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import passport from "passport";
+import { User } from "../entities/User";
+import { asyncHandler } from "../utils/asyncHandler";
+import { jwtSecret, jwtExpiresIn, frontendUrl } from "../config/env";
+import {
+  BadRequestError,
+  AuthFailureError,
+  NotFoundError,
+} from "../utils/ApiError";
+import { AppDataSource } from "../config/database";
+import { NotificationService } from "../services/notificationService";
 
 // Register new user
 export const register = asyncHandler(async (req: Request, res: Response) => {
@@ -21,7 +22,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   // Check if user already exists
   const existingUser = await userRepository.findOne({ where: { email } });
   if (existingUser) {
-    throw new BadRequestError('User with this email already exists');
+    throw new BadRequestError("User with this email already exists");
   }
 
   // Hash password
@@ -33,28 +34,26 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     email,
     password: hashedPassword,
     firstName,
-    lastName
+    lastName,
   });
 
   await userRepository.save(user);
 
   // Generate JWT token
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    jwtSecret,
-    { expiresIn: '7d' }
-  );
+  const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, {
+    expiresIn: jwtExpiresIn,
+  } as jwt.SignOptions);
 
   // Remove password from response
   const { password: _, ...userWithoutPassword } = user;
 
   res.status(201).json({
     success: true,
-    message: 'User registered successfully',
+    message: "User registered successfully",
     data: {
       user: userWithoutPassword,
-      token
-    }
+      token,
+    },
   });
 });
 
@@ -67,78 +66,85 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   // Find user by email
   const user = await userRepository.findOne({ where: { email } });
   if (!user) {
-    throw new AuthFailureError('Invalid email or password');
+    throw new AuthFailureError("Invalid email or password");
   }
 
   // Check if user is active
   if (!user.isActive) {
-    throw new AuthFailureError('Account is deactivated');
+    throw new AuthFailureError("Account is deactivated");
   }
 
   // Verify password
-  const isPasswordValid = await bcrypt.compare(password, user.password || '');
+  const isPasswordValid = await bcrypt.compare(password, user.password || "");
   if (!isPasswordValid) {
-    throw new AuthFailureError('Invalid email or password');
+    throw new AuthFailureError("Invalid email or password");
   }
 
   // Generate JWT token
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    jwtSecret,
-    { expiresIn: '7d' }
-  );
+  const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, {
+    expiresIn: jwtExpiresIn,
+  } as jwt.SignOptions);
 
   // Remove password from response
   const { password: _, ...userWithoutPassword } = user;
 
   res.json({
     success: true,
-    message: 'Login successful',
+    message: "Login successful",
     data: {
       user: userWithoutPassword,
-      token
-    }
+      token,
+    },
   });
 });
 
 // Google OAuth login
-export const googleAuth = passport.authenticate('google', {
-  scope: ['profile', 'email']
+export const googleAuth = passport.authenticate("google", {
+  scope: ["profile", "email"],
 });
 
 // Google OAuth callback
-export const googleAuthCallback = asyncHandler(async (req: Request, res: Response) => {
-  passport.authenticate('google', { session: false }, async (err: any, user: any) => {
-    if (err) {
-      throw new AuthFailureError('Google authentication failed');
-    }
+export const googleAuthCallback = asyncHandler(
+  async (req: Request, res: Response) => {
+    passport.authenticate(
+      "google",
+      { session: false },
+      async (err: any, user: any) => {
+        if (err) {
+          throw new AuthFailureError("Google authentication failed");
+        }
 
-    if (!user) {
-      throw new AuthFailureError('Google authentication failed');
-    }
+        if (!user) {
+          throw new AuthFailureError("Google authentication failed");
+        }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      jwtSecret,
-      { expiresIn: '7d' }
-    );
+        // Generate JWT token
+        const token = jwt.sign(
+          { userId: user.id, email: user.email },
+          jwtSecret,
+          { expiresIn: jwtExpiresIn } as jwt.SignOptions
+        );
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+        // Remove password from response
+        const { password: _, ...userWithoutPassword } = user;
 
-    // Redirect to frontend with token
-    res.redirect(`${frontendUrl}/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userWithoutPassword))}`);
-  })(req, res);
-});
+        // Redirect to frontend with token
+        res.redirect(
+          `${frontendUrl}/auth/callback?token=${token}&user=${encodeURIComponent(
+            JSON.stringify(userWithoutPassword)
+          )}`
+        );
+      }
+    )(req, res);
+  }
+);
 
 // Get current user profile
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
-  // User is already attached by auth middleware
   const user = req.user;
 
   if (!user) {
-    throw new NotFoundError('User not found');
+    throw new NotFoundError("User not found");
   }
 
   // Remove password from response
@@ -147,39 +153,49 @@ export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   res.json({
     success: true,
     data: {
-      user: userWithoutPassword
-    }
+      user: userWithoutPassword,
+    },
   });
 });
 
-// Update user profile
-export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
-  const { firstName, lastName, avatar } = req.body;
-  const userRepository = AppDataSource.getRepository(User);
+// Add FCM token
+export const addFcmToken = asyncHandler(async (req: Request, res: Response) => {
+  const { fcmToken } = req.body;
+  const userId = (req as any).user.id;
 
-  const user = await userRepository.findOne({ 
-    where: { id: (req.user as any).id } 
-  });
-
-  if (!user) {
-    throw new NotFoundError('User not found');
+  if (!fcmToken) {
+    throw new BadRequestError("FCM token is required");
   }
 
-  // Update user fields
-  if (firstName) user.firstName = firstName;
-  if (lastName) user.lastName = lastName;
-  if (avatar) user.avatar = avatar;
+  const success = await NotificationService.addFcmToken(userId, fcmToken);
 
-  await userRepository.save(user);
-
-  // Remove password from response
-  const { password: _, ...userWithoutPassword } = user;
+  if (!success) {
+    throw new BadRequestError("Failed to add FCM token");
+  }
 
   res.json({
     success: true,
-    message: 'Profile updated successfully',
-    data: {
-      user: userWithoutPassword
-    }
+    message: "FCM token added successfully",
   });
-}); 
+});
+
+// Remove FCM token
+export const removeFcmToken = asyncHandler(async (req: Request, res: Response) => {
+  const { fcmToken } = req.body;
+  const userId = (req as any).user.id;
+
+  if (!fcmToken) {
+    throw new BadRequestError("FCM token is required");
+  }
+
+  const success = await NotificationService.removeFcmToken(userId, fcmToken);
+
+  if (!success) {
+    throw new BadRequestError("Failed to remove FCM token");
+  }
+
+  res.json({
+    success: true,
+    message: "FCM token removed successfully",
+  });
+});

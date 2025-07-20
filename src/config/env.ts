@@ -16,6 +16,9 @@ export const dbName = process.env.DB_NAME || "ecommerce";
 export const jwtSecret = process.env.JWT_SECRET || "your-secret-key";
 export const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "7d";
 
+// Session Configuration
+export const sessionSecret = process.env.SESSION_SECRET || "your-session-secret";
+
 // OAuth Configuration
 export const googleClientId = process.env.GOOGLE_CLIENT_ID;
 export const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -32,4 +35,7 @@ export const firebaseClientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
 // MyFatoorah Configuration (for later use)
 export const myFatoorahApiKey = process.env.MYFATOORAH_API_KEY;
-export const myFatoorahBaseUrl = process.env.MYFATOORAH_BASE_URL || "https://api.myfatoorah.com"; 
+export const myFatoorahBaseUrl = process.env.MYFATOORAH_BASE_URL || "https://api.myfatoorah.com";
+
+// Auction Configuration
+export const auctionCheckInterval = parseInt(process.env.AUCTION_CHECK_INTERVAL || "5"); 

@@ -11,7 +11,8 @@ export enum ProductStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
   SOLD = 'sold',
-  EXPIRED = 'expired'
+  EXPIRED = 'expired',
+  CONCLUDED = 'concluded'
 }
 
 @Entity('products')

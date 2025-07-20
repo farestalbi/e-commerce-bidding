@@ -14,7 +14,7 @@ export class Bid {
   userId: string;
 
   @ManyToOne(() => Product, product => product.bids)
-  @JoinColumn({ name: 'productId' }) // 👈 important
+  @JoinColumn({ name: 'productId' })
   product: Product;
 
   @Column()

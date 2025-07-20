@@ -4,10 +4,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import session from 'express-session';
 import { AppDataSource } from './config/database';
-import { port, environment } from './config/env';
+import { port, environment, sessionSecret } from './config/env';
 import routes from './routes';
 import { ApiError } from './utils/ApiError';
 import passport from './config/passport';
+import { AppInitializer } from './services/appInitializer';
 
 const app = express();
 
@@ -17,9 +18,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session middleware (required for passport)
+// Session middleware
 app.use(session({
-  secret: 'your-session-secret',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: { secure: environment === 'production' }
@@ -69,8 +70,12 @@ app.use('*', (req, res) => {
 
 // Initialize database and start server
 AppDataSource.initialize()
-  .then(() => {
+  .then(async () => {
     console.log('Database connected successfully');
+    
+    // Initialize application services (including auction scheduler)
+    await AppInitializer.initialize();
+    
     app.listen(port, () => {
       console.log(`Server is running on port ${port} in ${environment} mode`);
     });
@@ -78,4 +83,17 @@ AppDataSource.initialize()
   .catch((error) => {
     console.error('Database connection failed:', error);
     process.exit(1);
-  }); 
+  });
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  await AppInitializer.shutdown();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received, shutting down gracefully');
+  await AppInitializer.shutdown();
+  process.exit(0);
+}); 

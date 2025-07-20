@@ -6,9 +6,6 @@ export enum OrderStatus {
   PENDING_PAYMENT = 'pending_payment',
   PAID = 'paid',
   FAILED = 'failed',
-  CANCELLED = 'cancelled',
-  SHIPPED = 'shipped',
-  DELIVERED = 'delivered'
 }
 
 @Entity('orders')

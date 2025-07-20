@@ -1,22 +1,16 @@
-import { Router } from 'express';
-import {
-  cancelBid,
-  getBidHistory,
-  getUserBids,
-  placeBid
-} from '../../controllers/bidController';
-import { authenticateToken } from '../../middleware/authentication';
-import { validate } from '../../middleware/validation';
-import { placeBidSchema } from './bidSchema';
+import { Router } from "express";
+import { placeBid } from "../../controllers/bidController";
+import { authenticateToken } from "../../middleware/authentication";
+import { validate } from "../../middleware/validation";
+import { placeBidSchema } from "./bidSchema";
 
 const router = Router();
 
-// Public routes
-router.get('/product/:productId', getBidHistory);
-
-// Protected routes
-router.post('/product/:productId', authenticateToken, validate(placeBidSchema), placeBid);
-router.get('/user', authenticateToken, getUserBids);
-router.delete('/:bidId', authenticateToken, cancelBid);
-
-export default router; 
+// Place a bid on a product
+router.post(
+  "/product/:productId/bids",
+  authenticateToken,
+  validate(placeBidSchema),
+  placeBid
+);
+export default router;
