@@ -135,7 +135,3 @@ The API uses JWT tokens for authentication. Include the token in the Authorizati
 ```
 Authorization: Bearer <your-jwt-token>
 ```
-
-## License
-
-ISC 
