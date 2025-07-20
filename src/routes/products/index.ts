@@ -204,11 +204,7 @@ router.get('/:id', validate(productIdSchema, ValidationSource.PARAMS), getProduc
  *                 format: date-time
  *                 description: Auction end time (required for auction products)
  *                 example: 2024-12-31T23:59:59.000Z
- *               minimumBidIncrement:
- *                 type: number
- *                 minimum: 0
- *                 description: Minimum bid increment for auction products
- *                 example: 10.00
+
  *               category:
  *                 type: string
  *                 maxLength: 100

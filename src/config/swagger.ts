@@ -157,11 +157,7 @@ const options = {
               description: "Auction end time",
               example: "2024-12-31T23:59:59.000Z",
             },
-            minimumBidIncrement: {
-              type: "number",
-              description: "Minimum bid increment for auction products",
-              example: 10.0,
-            },
+
             category: {
               type: "string",
               description: "Product category",

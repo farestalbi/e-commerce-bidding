@@ -56,8 +56,7 @@ export class Product {
   @Column({ nullable: true })
   auctionEndTime: Date;
 
-  @Column({ nullable: true })
-  minimumBidIncrement: number;
+
 
   // Common fields
   @Column({ nullable: true })

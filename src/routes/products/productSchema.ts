@@ -30,11 +30,7 @@ export const createProductSchema = Joi.object({
     then: Joi.date().greater("now").required(),
     otherwise: Joi.forbidden(),
   }),
-  minimumBidIncrement: Joi.when("type", {
-    is: "auction",
-    then: Joi.number().positive().optional(),
-    otherwise: Joi.forbidden(),
-  }),
+
   category: Joi.string().max(100).optional(),
   imageUrl: Joi.string().uri().optional(),
 });
@@ -47,7 +43,7 @@ export const updateProductSchema = Joi.object({
   stockQuantity: Joi.number().integer().min(0).optional(),
   startingPrice: Joi.number().positive().optional(),
   auctionEndTime: Joi.date().greater("now").optional(),
-  minimumBidIncrement: Joi.number().positive().optional(),
+
   category: Joi.string().max(100).optional(),
   imageUrl: Joi.string().uri().optional(),
   status: Joi.string().valid("active", "inactive", "sold", "expired").optional(),

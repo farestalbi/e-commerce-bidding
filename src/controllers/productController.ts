@@ -83,7 +83,6 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
     stockQuantity,
     startingPrice,
     auctionEndTime,
-    minimumBidIncrement,
     category
   } = req.body;
 
@@ -103,7 +102,6 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
     productData.startingPrice = startingPrice;
     productData.currentHighestBid = startingPrice;
     productData.auctionEndTime = auctionEndTime ? new Date(auctionEndTime) : null;
-    productData.minimumBidIncrement = minimumBidIncrement;
   }
 
   const product = productRepository.create(productData);
