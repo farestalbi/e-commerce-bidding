@@ -27,6 +27,7 @@ export const githubClientSecret = process.env.GITHUB_CLIENT_SECRET;
 
 // Frontend Configuration
 export const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+export const apiUrl = process.env.API_URL || "http://localhost:3000";
 
 // Firebase Configuration (for later use)
 export const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;

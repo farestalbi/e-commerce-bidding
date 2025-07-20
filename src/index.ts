@@ -9,6 +9,8 @@ import routes from './routes';
 import { ApiError } from './utils/ApiError';
 import passport from './config/passport';
 import { AppInitializer } from './services/appInitializer';
+import swaggerUi from 'swagger-ui-express';
+import { specs, swaggerUiOptions } from './config/swagger';
 
 const app = express();
 
@@ -29,6 +31,9 @@ app.use(session({
 // Initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
 
 // Routes
 app.use('/api', routes);
